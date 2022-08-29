@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Traits\ResponseAction;
 
 class Author extends Model
 {
     use HasFactory;
+    use ResponseAction;
 
     protected $table = 'authors';
     protected $primaryKey = 'id';
@@ -87,23 +89,6 @@ class Author extends Model
         return ($validate);
     }
     
-    public function getAuthors (){
-        try {
-            $authors = Author::all();
-            if ($authors->isEmpty()) {
-                return response()->json(['status'=>'error', 'message'=>
-                'No se encontraron autores'], 404);
-            } else {
-                return response()->json(['status'=>'success', 'message'=>
-                'Autores encontrados', 'response'=>$authors], 200);
-            }
-        } catch (\Throwable $th) {
-            return response()->json(['status'=>'error', 'message'=>
-            'Error al obtener autores'], 500);
-        }
-    }
-    
-
     public function createAuthor($request){
         $validate = $this->validateNotRepeated($request);
         if ($validate->isEmpty()) {
@@ -120,26 +105,45 @@ class Author extends Model
                     'biography' => $request->biography,
                 ]);
                 
-                return response()->json(['status'=>'success', 'message'=>
-                'Autor creado exitosamente', 'response'=>$author], 200);
+                return $this->response('success', 'Author created successfully', null, 200);
             } catch (\Throwable $th) {
-                return response()->json(['status'=>'error', 'message'=>
-                'Error al crear autor'], 500);
+                return $this->response('error', 'An error ocurred', null, 500);
             }
-    
-        return ($request);
-
         } else {
-            return response()->json(['status'=>'error', 'message'=>
-            'Ya existe el autor'], 500);
+            return $this->response('error', 'The author already exists', null, 501);
         } 
     }
 
+    public function getAuthors (){
+        try {
+            $authors = Author::all();
+            if ($authors->isEmpty()) {
+                return $this->response('error', 'Authors not found', null, 404);
+            } else {
+                return $this->response('success', 'Authors found', $authors, 200);
+            }
+        } catch (\Throwable $th) {
+            return $this->response('error', 'An error ocurred', null, 500);
+        }
+    }
+
+    public function authorDetails($id){
+        try {
+            $authorDetails = $this::find($id);
+            if (is_null($authorDetails)) {
+                return $this->response('error', 'Author not found', null, 404);
+            } else {
+                return $this->response('success', 'Author found', $authorDetails, 200);
+            }        
+        } catch (\Throwable $th) {
+            return $this->response('error', 'An error ocurred', null, 500);
+        }
+    }
+    
     public function updateAuthor($request, $id){
         $author = $this::find($id);
         if (is_null($author)) {
-            return response()->json(['status'=>'error', 'message'=>
-            'Autor no encontrado'], 404);
+            return $this->response('error', 'Author not found', null, 404);
         } else {
             try {
                 $author->update([
@@ -154,28 +158,10 @@ class Author extends Model
                     'biography' => $request->biography,
                 ]);
                 
-                return response()->json(['status'=>'success', 'message'=>
-                'Autor actualizado exitosamente'], 200);
+                return $this->response('success', 'Author updated successfully', null, 200);
             } catch (\Throwable $th) {
-                return response()->json(['status'=>'error', 'message'=>
-                'Error al actualizar autor'], 500);
+                return $this->response('error', 'An error ocurred', null, 500);
             }
-        }
-    }
-
-    public function authorDetails($id){
-        try {
-            $authorDetails = $this::find($id);
-            if (is_null($authorDetails)) {
-                return response()->json(['status'=>'error', 'message'=>
-                'No se encontró al autor'], 404);
-            } else {
-                return response()->json(['status'=>'success', 'message'=>
-                'Autor encontrado', 'response'=>$authorDetails], 200);
-            }        
-        } catch (\Throwable $th) {
-            return response()->json(['status'=>'error', 'message'=>
-            'Ocurrió un error'], 500);
         }
     }
 
@@ -183,16 +169,13 @@ class Author extends Model
         try {
             $author = $this::find($id);
             if (is_null($author)) {
-                return response()->json(['status'=>'error', 'message'=>
-                'No se encontró al autor'], 404);
+                return $this->response('error', 'Author not found', null, 404);
             } else {
                 $author->delete();
-                return response()->json(['status'=>'success', 'message'=>
-                'Autor borrado exitosamente'], 200);
+                return $this->response('success', 'Author deleted successfully', null, 200);
             }
         } catch (\Throwable $th) {
-            return response()->json(['status'=>'error', 'message'=>
-            'Ocurrió un error'], 500);
+            return $this->response('error', 'An error ocurred', null, 500);
         }
     }
 }

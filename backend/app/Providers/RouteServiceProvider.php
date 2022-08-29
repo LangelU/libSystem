@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
-{
+{   
+    protected $moduleNamespace = 'App\Modules';
     /**
      * The path to the "home" route for your application.
      *
@@ -30,7 +31,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->routes(function () {
             Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+                ->group(base_path('routes/web.php'),
+                        base_path('App/Modules/AuthorModule/routes/web.php'));
 
             Route::prefix('api')
                 ->middleware('api')
@@ -48,5 +50,15 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60);
         });
+    }
+
+    protected function mapWebModuleRoutes()
+    {
+        Route::middleware('web')
+            ->namespace($this->moduleNamespace)
+            ->group(function () {
+                require(base_path('app/Modules/AuthorModule/routes/web.php'));
+                
+            });
     }
 }

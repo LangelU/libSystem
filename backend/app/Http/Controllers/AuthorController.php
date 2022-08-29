@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use Illuminate\Http\Request;
 
-class AuthorController extends Controller
-{   
+class AuthorController extends Controller {   
     public function __construct(){
         $this->Author = new Author();
     }
 
     public function index() {
-        $authors = $this->Author->getAuthors();
-        return ($authors);
+        $response = $this->Author->getAuthors();
+        return ($response);
     }
 
     public function create() {

@@ -5,81 +5,37 @@ namespace App\Http\Controllers;
 use App\Models\Acknowledgments;
 use Illuminate\Http\Request;
 
-class AcknowledgmentsController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
+class AcknowledgmentsController extends Controller {
+    public function __construct(){
+        $this->Author = new Acknowledgments();
+    }
+
+    public function index() {
+        $response = $this->Author->getAcknowledgments();
+        return ($response);
+    }
+
+    public function create() {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
+    public function store(Request $request) {
+        $response = $this->Author->createAcknowledgments($request);
+        return($response);
+    }
+
+
+    public function edit() {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function update(Request $request, $id){
+        $response = $this->Author->updateAcknowledgment($request, $id);
+        return($response);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Acknowledgments  $acknowledgments
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Acknowledgments $acknowledgments)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Acknowledgments  $acknowledgments
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Acknowledgments $acknowledgments)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Acknowledgments  $acknowledgments
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Acknowledgments $acknowledgments)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Acknowledgments  $acknowledgments
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Acknowledgments $acknowledgments)
-    {
-        //
+    public function destroy($id) {
+        $response = $this->Author->deleteAcknowledgment($id);
+        return ($response);
     }
 }
